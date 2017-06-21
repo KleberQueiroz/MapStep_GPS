@@ -41,6 +41,7 @@ import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.MarkerOptions;
 
 import java.util.ArrayList;
+import java.util.Calendar;
 
 import static com.google.android.gms.common.zze.GOOGLE_PLAY_SERVICES_VERSION_CODE;
 
@@ -135,6 +136,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
                     dialog.setView(customAlert);
                     dialog.show();
 
+                    saveData();
 
                 }
             }
@@ -156,6 +158,30 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
         if (locationManager.isProviderEnabled(LocationManager.GPS_PROVIDER)) {
             Toast.makeText(this, "GPS ON", Toast.LENGTH_SHORT).show();
         }
+
+    }
+
+    private void saveData() {
+
+        String data_directions = "", data_latlong = "";
+        Long current_time = Calendar.getInstance().getTimeInMillis();
+
+        if (latLong.isEmpty() || directions.isEmpty()) return;
+
+        for (String tmp: directions) {
+            data_directions += (tmp + "\n");
+        }
+
+        for (String tmp: latLong) {
+            data_latlong += (tmp + "\n");
+        }
+
+        FileManager fm = new FileManager(this);
+
+        fm.salvar(data_directions, "directions" + current_time);
+        fm.salvar(data_latlong, "latlong" + current_time);
+
+        Toast.makeText(getApplicationContext(), "data is saved, " + current_time, Toast.LENGTH_SHORT).show();
 
     }
 
