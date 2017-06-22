@@ -29,6 +29,7 @@ public class FileManager {
 
         boolean save = false;
         try {
+
             FileOutputStream fOut = context.openFileOutput(nome_arquivo, Context.MODE_PRIVATE);
 
             fOut.write(str.getBytes());

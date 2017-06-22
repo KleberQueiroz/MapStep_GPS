@@ -84,8 +84,8 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
 
     private boolean moveCamera = true;
 
-    private ArrayList<String> latLong = new ArrayList<String>();
-    private ArrayList<String> directions = new ArrayList<String>();
+    private ArrayList<String> latLong;
+    private ArrayList<String> directions;
 
     private View customAlert;
 
@@ -93,6 +93,10 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_maps);
+
+        latLong = new ArrayList<String>();
+        directions = new ArrayList<String>();
+
         // Obtain the SupportMapFragment and get notified when the map is ready to be used.
         SupportMapFragment mapFragment = (SupportMapFragment) getSupportFragmentManager()
                 .findFragmentById(R.id.map);
@@ -178,10 +182,14 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
 
         FileManager fm = new FileManager(this);
 
-        fm.salvar(data_directions, "directions" + current_time);
-        fm.salvar(data_latlong, "latlong" + current_time);
+        fm.salvar(data_directions   , fm.DIRECTIONS);
+        fm.salvar(data_latlong      , fm.LATLONG);
 
         Toast.makeText(getApplicationContext(), "data is saved, " + current_time, Toast.LENGTH_SHORT).show();
+
+        // clear data
+        latLong = new ArrayList<String>();
+        directions = new ArrayList<String>();
 
     }
 
