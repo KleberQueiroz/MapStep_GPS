@@ -13,8 +13,8 @@ import java.io.FileOutputStream;
 public class FileManager {
 
 
-    public static final String DIRECTIONS = "direct.txt";
-    public static final String LATLONG = "latlong.txt";
+    public static final String DIRECTIONS = "direction";
+    public static final String LATLONG = "latlong";
 
     private static final String TAG = "IO_file";
     private static int lastId = 0;

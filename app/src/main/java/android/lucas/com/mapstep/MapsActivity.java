@@ -8,6 +8,8 @@ import android.hardware.SensorEventListener;
 import android.hardware.SensorManager;
 import android.location.Location;
 import android.location.LocationManager;
+import android.lucas.com.mapstep.db.DBHelper;
+import android.lucas.com.mapstep.db.model.PairEntry;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.v4.app.ActivityCompat;
@@ -89,10 +91,14 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
 
     private View customAlert;
 
+    private DBHelper dbHelper;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_maps);
+
+        dbHelper = new DBHelper(this);
 
         latLong = new ArrayList<String>();
         directions = new ArrayList<String>();
@@ -180,10 +186,8 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
             data_latlong += (tmp + "\n");
         }
 
-        FileManager fm = new FileManager(this);
-
-        fm.salvar(data_directions   , fm.DIRECTIONS);
-        fm.salvar(data_latlong      , fm.LATLONG);
+        saveToDB(new PairEntry(FileManager.DIRECTIONS + current_time, data_directions));
+        saveToDB(new PairEntry(FileManager.LATLONG + current_time, data_latlong));
 
         Toast.makeText(getApplicationContext(), "data is saved, " + current_time, Toast.LENGTH_SHORT).show();
 
@@ -191,6 +195,10 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
         latLong = new ArrayList<String>();
         directions = new ArrayList<String>();
 
+    }
+
+    private void saveToDB(PairEntry entry) {
+        dbHelper.addPairEntry(entry);
     }
 
     @Override
