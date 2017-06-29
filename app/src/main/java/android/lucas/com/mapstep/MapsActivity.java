@@ -11,7 +11,6 @@ import android.location.LocationManager;
 import android.lucas.com.mapstep.db.DBHelper;
 import android.lucas.com.mapstep.db.model.PairEntry;
 import android.support.annotation.NonNull;
-import android.support.annotation.Nullable;
 import android.support.v4.app.ActivityCompat;
 import android.support.v4.app.FragmentActivity;
 import android.os.Bundle;
@@ -305,15 +304,22 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
 
     public void updateCurrentLocation()
     {
-        lastPoint = new LocationBasedStepDetector()
-                .calcFinalPosition(
-                        azimut,
-                        LocationBasedStepDetector.STEP_DISTANCE,
-                        lastPoint);
+
+        updateLastPoint();
 
         mLog_d("Lat: " + lastPoint.lat + ", Lon: " + lastPoint.lon);
 
         addMarker(lastPoint, mMap);
+
+    }
+
+    private void updateLastPoint() {
+
+        lastPoint = LastLocationUpdater.calcNextLocation(
+                        azimut,
+                        LastLocationUpdater.STEP_DISTANCE,
+                        lastPoint);
+
     }
 
     public void addMarker(Point point, GoogleMap googleMap)
