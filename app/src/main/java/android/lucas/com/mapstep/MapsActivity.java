@@ -10,6 +10,8 @@ import android.location.Location;
 import android.lucas.com.mapstep.db.DBHelper;
 import android.lucas.com.mapstep.db.model.PairEntry;
 import android.lucas.com.mapstep.dialog.DataDialog;
+import android.lucas.com.mapstep.sensor.sensors.Orientation;
+import android.lucas.com.mapstep.sensor.utils.OrientationSensorInterface;
 import android.support.v4.app.ActivityCompat;
 import android.support.v4.app.FragmentActivity;
 import android.os.Bundle;
@@ -43,7 +45,7 @@ import java.util.Calendar;
 import static com.google.android.gms.common.zze.GOOGLE_PLAY_SERVICES_VERSION_CODE;
 
 public class MapsActivity extends FragmentActivity implements OnMapReadyCallback, GoogleApiClient.ConnectionCallbacks,
-        GoogleApiClient.OnConnectionFailedListener, LocationListener, SensorEventListener {
+        GoogleApiClient.OnConnectionFailedListener, LocationListener, SensorEventListener, OrientationSensorInterface {
 
     //LogCat tag
     private static final String TAG = MapsActivity.class.getSimpleName();
@@ -64,7 +66,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
     private Sensor magnetometer;
     private Sensor stepDetector;
     private float azimut;
-    private TextView textView;
+    private TextView textView, textView2;
     private Switch button;
 
     private boolean moveCamera = true;
@@ -89,6 +91,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
         stepDetector    = mSensorManager.getDefaultSensor(Sensor.TYPE_STEP_DETECTOR);
 
         textView        = (TextView) findViewById(R.id.textView);
+        textView2       = (TextView) findViewById(R.id.textView2);
         button          = (Switch) findViewById(R.id.switch1);
 
         // Obtain the SupportMapFragment and get notified when the map is ready to be used.
@@ -98,6 +101,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
 
         setButtons();
         permissionRequest();
+        useStableSensor();
 
         if (checkPlayServices()) {
 
@@ -111,6 +115,16 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
             mLocationRequest.setPriority(LocationRequest.PRIORITY_HIGH_ACCURACY);
 
         }
+
+    }
+
+    private Orientation orientationSensor;
+    private void useStableSensor() {
+
+        orientationSensor = new Orientation(this.getApplicationContext(), this);
+
+        // set tolerance for any directions
+        orientationSensor.init(1.0, 1.0, 1.0);
 
     }
 
@@ -190,6 +204,12 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
 
         checkPlayServices();
 
+        // set output speed and turn initialized sensor on
+        // 0 Normal
+        // 1 UI
+        // 2 GAME
+        // 3 FASTEST
+        orientationSensor.on(0);
         mSensorManager.registerListener(this, accelerometer, SensorManager.SENSOR_DELAY_GAME);
         mSensorManager.registerListener(this, magnetometer, SensorManager.SENSOR_DELAY_GAME);
         mSensorManager.registerListener(this, stepDetector, SensorManager.SENSOR_DELAY_GAME);
@@ -219,6 +239,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
         mLog_i("onPause()");
 
         mSensorManager.unregisterListener(this);
+        orientationSensor.off();
 
         if (mGoogleApiClient.isConnected()) {
             stopLocationUpdates();
@@ -495,4 +516,16 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
         Log.i(TAG, txt);
     }
 
+    private Double azimut_;
+    @Override
+    public void orientation(Double AZIMUTH, Double PITCH, Double ROLL) {
+
+        if (AZIMUTH > 180) {
+            azimut_ = AZIMUTH - 360;
+        } else {
+            azimut_ = AZIMUTH;
+        }
+        textView2.setText(String.valueOf(azimut_));
+
+    }
 }
