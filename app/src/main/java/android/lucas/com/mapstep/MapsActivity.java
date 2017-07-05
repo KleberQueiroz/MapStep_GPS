@@ -65,7 +65,6 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
     private Sensor accelerometer;
     private Sensor magnetometer;
     private Sensor stepDetector;
-    private float azimut;
     private TextView textView, textView2;
     private Switch button;
 
@@ -73,6 +72,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
 
     private ArrayList<String> latLong;
     private ArrayList<String> directions;
+    private ArrayList<String> direcs_stable;
 
     private DBHelper dbHelper;
 
@@ -84,6 +84,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
         dbHelper        = new DBHelper(this);
         latLong         = new ArrayList<String>();
         directions      = new ArrayList<String>();
+        direcs_stable   = new ArrayList<String>();
 
         mSensorManager  = (SensorManager) getSystemService(SENSOR_SERVICE);
         accelerometer   = mSensorManager.getDefaultSensor(Sensor.TYPE_ACCELEROMETER);
@@ -140,8 +141,9 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
         ((Button)findViewById(R.id.btn2)).setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                ArrayList<PairEntry> pairEntries = dbHelper.findAll();
-                Toast.makeText(getApplicationContext(), "Size: " + pairEntries.size(), Toast.LENGTH_SHORT).show();
+                saveData();
+//                ArrayList<PairEntry> pairEntries = dbHelper.findAll();
+//                Toast.makeText(getApplicationContext(), "Size: " + pairEntries.size(), Toast.LENGTH_SHORT).show();
             }
         });
 
@@ -155,7 +157,6 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
 
             mLog_i("latLong: " + latLong.size());
             DataDialog.getDialog(this, latLong, directions).show();
-            saveData();
 
         }
 
@@ -177,8 +178,8 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
         Toast.makeText(getApplicationContext(), "data is saved, " + current_time, Toast.LENGTH_SHORT).show();
 
         // clear data
-//        latLong.clear();
-//        directions.clear();
+        latLong.clear();
+        directions.clear();
         mMap.clear();
 
     }
@@ -455,6 +456,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
     private boolean isReadyGeomagnetic;
     private float[] mGravity = new float[3];
     private float[] mGeomagnetic = new float[3];
+    private float azimut;
     private void updateAzimut(SensorEvent sensorEvent) {
 
         float accelFilteringFactor = 0.1f;
